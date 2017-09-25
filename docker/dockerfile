@@ -1,0 +1,15 @@
+FROM python:3.6.2-stretch
+
+RUN apt-get update && apt-get install -y \
+  git \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY entrypoint.sh /
+COPY instalar.sh /
+
+RUN mkdir /src
+WORKDIR /src
+RUN git clone https://github.com/pablodanielrey/microservices_common.git
+
+ENTRYPOINT ["/entrypoint.sh"]
