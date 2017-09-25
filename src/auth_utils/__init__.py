@@ -2,7 +2,6 @@ import logging
 from flask_oidc import OpenIDConnect
 from flask import g
 
-
 logger = logging.getLogger(__name__)
 
 class MyOpenIDConnect(OpenIDConnect):
@@ -172,7 +171,6 @@ class RedisWrapper(object):
             self.r = redis.StrictRedis(host='localhost', port=6379, db=0)
 
     def __setitem__(self, key, value):
-        print(key)
         return self.r.set(key, json.dumps(value))
 
     def __getitem__(self, key):
@@ -230,5 +228,6 @@ class DictWrapper(object):
 
 __all__ = [
     'MyOpenIDConnect',
-    'DictWrapper'
+    'DictWrapper',
+    'RedisWrapper'
 ]
