@@ -146,8 +146,8 @@ class MyOpenIDConnect(OpenIDConnect):
                     signed_id_token,
                     secure=cookie_secure,
                     httponly=True,
-                    max_age=self.current_app.config['OIDC_ID_TOKEN_COOKIE_TTL'],
-                    domain=self.current_app.config['OIDC_ID_TOKEN_COOKIE_DOMAIN'])
+                    max_age=self.current_app.config['OIDC_ID_TOKEN_COOKIE_TTL'])
+                    #domain=self.current_app.config['OIDC_ID_TOKEN_COOKIE_DOMAIN'])
             else:
                 # This was a log out
                 response.set_cookie(
@@ -155,8 +155,8 @@ class MyOpenIDConnect(OpenIDConnect):
                     '',
                     secure=cookie_secure,
                     httponly=True,
-                    expires=0,
-                    domain=self.current_app.config['OIDC_ID_TOKEN_COOKIE_DOMAIN'])
+                    expires=0)
+                    #domain=self.current_app.config['OIDC_ID_TOKEN_COOKIE_DOMAIN'])
         return response
 
 import json
