@@ -1,3 +1,12 @@
+from .registrar import RegistrarServicio
+
+__all__ = [
+    'MyOpenIDConnect',
+    'DictWrapper',
+    'RedisWrapper',
+    'RegistrarServicio'
+]
+
 import logging
 from flask_oidc import OpenIDConnect
 from flask import g
@@ -225,9 +234,3 @@ class DictWrapper(object):
         v = self.data.pop(key)
         logging.debug('{} --- pop {} --> {}'.format(self.name, key, v))
         return v
-
-__all__ = [
-    'MyOpenIDConnect',
-    'DictWrapper',
-    'RedisWrapper'
-]
