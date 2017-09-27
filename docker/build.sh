@@ -1,2 +1,2 @@
 #!/bin/bash
-sudo docker build -t microservices_common .
+sudo docker build --no-cache -t microservices_common .
