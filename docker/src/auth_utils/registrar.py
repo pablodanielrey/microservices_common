@@ -8,7 +8,7 @@ class RegistrarServicio:
 
     @classmethod
     def register(cls, name='web', domain='localhost', path = '/', server='127.0.0.1:8080'):
-        server_name = f'{name}_{server}'
+        server_name = f'{name}_{server}'.replace(':','_')
 
         to_register = [
             (f'/services/{name}/location', domain),
@@ -21,11 +21,14 @@ class RegistrarServicio:
             try:
                 for k,v in to_register:
                     try:
-                        c.refresh(k, ttl=13)
+                        print(c.refresh(k, ttl=13))
                     except etcd.EtcdKeyNotFound:
-                        c.write(k, v, ttl=13)
+                        print(c.write(k, v, ttl=13))
 
-                time.sleep(10)
+            except Exception as e:
+                logging.exception(e)
 
+            try:
+                time.sleep(5)
             except Exception as e:
                 logging.exception(e)
