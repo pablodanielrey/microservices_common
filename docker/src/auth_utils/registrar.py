@@ -32,3 +32,24 @@ class RegistrarServicio:
                 time.sleep(5)
             except Exception as e:
                 logging.exception(e)
+
+    @classmethod
+    def register_once(cls, name='web', domain='localhost', path = '/', server='127.0.0.1:8080'):
+        server_name = f'{name}_{server}'.replace(':','_')
+
+        to_register = [
+            (f'/services/{name}/location', domain),
+            (f'/services/{name}/path', path),
+            (f'/services/{name}/upstream/{server_name}', server)
+        ]
+
+        c = etcd.Client(host=cls.host, port=2379, protocol='http')
+        try:
+            for k,v in to_register:
+                try:
+                    print(c.refresh(k))
+                except etcd.EtcdKeyNotFound:
+                    print(c.write(k, v))
+
+        except Exception as e:
+            logging.exception(e)
