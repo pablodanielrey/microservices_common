@@ -46,10 +46,7 @@ class RegistrarServicio:
         c = etcd.Client(host=cls.host, port=2379, protocol='http')
         try:
             for k,v in to_register:
-                try:
-                    print(c.refresh(k))
-                except etcd.EtcdKeyNotFound:
-                    print(c.write(k, v))
+                print(c.write(k, v))
 
         except Exception as e:
             logging.exception(e)
