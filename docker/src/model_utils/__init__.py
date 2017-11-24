@@ -20,3 +20,8 @@ class MyBaseClass:
         return s.query(cls).all()
 
 Base = declarative_base(cls=(JsonSerializableBase,MyBaseClass))
+
+class MyJsonBaseClass:
+
+    def __json__(self, exluded_keys=set()):
+        return self.__dict__
