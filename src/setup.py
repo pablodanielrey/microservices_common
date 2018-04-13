@@ -12,7 +12,7 @@
 from setuptools import setup, find_packages
 
 setup(name='microservices_common',
-          version='1.0.0',
+          version='1.2.0',
           description='Proyecto que implementa las librerías comunes para los microservicios',
           url='https://github.com/pablodanielrey/microservices_common',
           author='Desarrollo DiTeSi, FCE',
@@ -31,7 +31,8 @@ setup(name='microservices_common',
                             'Flask',
                             'flask_jsontools',
                             'Flask-OIDC',
-                            'SQLAlchemy'],
+                            'SQLAlchemy',
+                            'requests'],
           entry_points={
             'console_scripts': [ ]
           }

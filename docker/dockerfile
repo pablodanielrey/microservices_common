@@ -5,12 +5,12 @@ FROM python:3.6.2-stretch
 #  && apt-get clean \
 #  && rm -rf /var/lib/apt/lists/*
 
-COPY entrypoint.sh /
-COPY instalar.sh /
-COPY .pypirc /root/
+COPY docker/entrypoint.sh /
+COPY docker/instalar.sh /
+COPY docker/.pypirc /root/
 
-RUN mkdir /src
+COPY src /src
 WORKDIR /src
-RUN git clone https://github.com/pablodanielrey/microservices_common.git
+RUN cd /src && python setup.py sdist upload -r internal
 
 ENTRYPOINT ["/entrypoint.sh"]
