@@ -58,12 +58,52 @@ class ClientCredentialsGrant:
 class TokenIntrospection:
 
     introspect_url = os.environ['OIDC_HOST'] + '/oauth2/introspect'
+    warden_url = os.environ['OIDC_HOST'] + '/warden/token/allowed'
 
     def __init__(self, client_id, client_secret, realm='', verify=False):
         self.realm = realm
         self.verify = verify
         self.client_id = client_id
         self.client_secret = client_secret
+
+    def require_valid_token_for(self, resource, action, f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            '''
+                Recupera y chequea el token por validez
+            '''
+            token = self.bearer_token(flask.request.headers)
+            if not token:
+                return self.invalid_token()
+            tk = self.verify_token(token)
+            if not tk:
+                return self.invalid_request()
+            acc = self.introspect_warden(tk, resource, action)
+            if not acc:
+                return self.insufficient_scope()
+            kwargs['token'] = tk
+            kwargs['access'] = acc
+            return f(*args, **kwargs)
+
+        return decorated_function
+
+    def introspect_warden(self, token, resource, action):
+        auth = HTTPBasicAuth(self.client_id, self.client_secret)
+        data = {
+            'token':token,
+            'action':action,
+            'resource':resource
+        }
+        headers = {
+            'Accept':'application/json'
+        }
+        r = requests.post(self.warden_url, verify=self.verify, allow_redirects=False, auth=auth, headers=headers, data=data)
+        if r.ok:
+            js = r.json()
+            if js['allowed'] == True:
+                return js
+        return None
+
 
     def require_valid_token(self, f):
         @wraps(f)
