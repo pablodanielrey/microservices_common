@@ -66,38 +66,46 @@ class TokenIntrospection:
         self.client_id = client_id
         self.client_secret = client_secret
 
-    def require_valid_token_for(self, resource, action, f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            '''
-                Recupera y chequea el token por validez
-            '''
-            token = self.bearer_token(flask.request.headers)
-            if not token:
-                return self.invalid_token()
-            tk = self.verify_token(token)
-            if not tk:
-                return self.invalid_request()
-            acc = self.introspect_warden(tk, resource, action)
-            if not acc:
-                return self.insufficient_scope()
-            kwargs['token'] = tk
-            kwargs['access'] = acc
-            return f(*args, **kwargs)
-
-        return decorated_function
+    def require_valid_token_for(self, resource, action):
+        def wraped_f(*args):
+            def decorated_function(*args, **kwargs):
+                '''
+                    Recupera y chequea el token por validez
+                '''
+                token = self.bearer_token(flask.request.headers)
+                if not token:
+                    return self.invalid_token()
+                #tk = self.verify_token(token)
+                #if not tk:
+                #    return self.invalid_request()
+                acc = self.introspect_warden(token, resource, action)
+                if not acc:
+                    return self.invalid_request()
+                    #return self.insufficient_scope()
+                kwargs['token'] = tk
+                kwargs['access'] = acc
+                return f(*args, **kwargs)
+            return decorated_function
+        return wraped_f
 
     def introspect_warden(self, token, resource, action):
-        auth = HTTPBasicAuth(self.client_id, self.client_secret)
+        """ aparentemente warden requiere tokens """
+        cc = ClientCredentialsGrant(self.client_id, self.client_secret, True)
+        tkr = cc.access_token(['hydra.warden'])
+        tk = cc.get_token(tkr)
+
+        #auth = HTTPBasicAuth(self.client_id, self.client_secret)
         data = {
             'token':token,
-            'action':action,
+            #'action':action,
             'resource':resource
         }
         headers = {
+            'Authorization': 'Bearer {}'.format(tk),
             'Accept':'application/json'
         }
-        r = requests.post(self.warden_url, verify=self.verify, allow_redirects=False, auth=auth, headers=headers, data=data)
+        #r = requests.post(self.warden_url, verify=self.verify, allow_redirects=False, auth=auth, headers=headers, data=data)
+        r = requests.post(self.warden_url, verify=self.verify, allow_redirects=False, headers=headers, data=data)
         if r.ok:
             js = r.json()
             if js['allowed'] == True:
