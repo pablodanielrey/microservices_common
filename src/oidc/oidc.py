@@ -58,7 +58,6 @@ class ClientCredentialsGrant:
 class TokenIntrospection:
 
     introspect_url = os.environ['OIDC_HOST'] + '/oauth2/introspect'
-    warden_url = os.environ['OIDC_HOST'] + '/warden/token/allowed'
 
     def __init__(self, client_id, client_secret, realm='', verify=False):
         self.realm = realm
@@ -66,6 +65,7 @@ class TokenIntrospection:
         self.client_id = client_id
         self.client_secret = client_secret
 
+    """
     def require_valid_token_for(self, resource, action):
         def wraped_f(*args):
             def decorated_function(*args, **kwargs):
@@ -89,7 +89,6 @@ class TokenIntrospection:
         return wraped_f
 
     def introspect_warden(self, token, resource, action):
-        """ aparentemente warden requiere tokens """
         cc = ClientCredentialsGrant(self.client_id, self.client_secret, True)
         tkr = cc.access_token(['hydra.warden'])
         tk = cc.get_token(tkr)
@@ -111,7 +110,28 @@ class TokenIntrospection:
             if js['allowed'] == True:
                 return js
         return None
+    """
 
+    def require_token_scopes(self, scopes=[]):
+        def real_decorator(f):
+            @wraps(f)
+            def wrapper(*args, **kwargs):
+                token = self.bearer_token(flask.request.headers)
+                if not token:
+                    return self.invalid_token()
+                tk = self.verify_token(token)
+                if not tk:
+                    return self.invalid_request()
+                if scopes and len(scopes) > 0:
+                    tscopes = tk['scope'].lower().split(' ')
+                    for s in scopes:
+                        if s not in tscopes:
+                            return self.insufficient_scope()
+                kwargs['token'] = tk
+                #kwargs['access'] = acc
+                return f(*args, **kwargs)
+            return wrapper
+        return real_decorator
 
     def require_valid_token(self, f):
         @wraps(f)
@@ -129,7 +149,6 @@ class TokenIntrospection:
             return f(*args, **kwargs)
 
         return decorated_function
-
 
     def bearer_token(self, headers):
         if 'Authorization' in headers:
@@ -159,7 +178,6 @@ class TokenIntrospection:
         if not tk or not tk['active']:
             return None
         return tk
-
 
     def invalid_request(self):
         return self.require_auth(text='Bad Request', error='invalid_request', status=400)
