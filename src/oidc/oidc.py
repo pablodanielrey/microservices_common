@@ -31,7 +31,7 @@ class ClientCredentialsGrant:
 
     token_url = os.environ['OIDC_HOST'] + '/oauth2/token'
 
-    def __init__(self, client_id, client_secret, verify=True):
+    def __init__(self, client_id, client_secret, verify=False):
         self.verify = verify
         self.client_id = client_id
         self.client_secret = client_secret
