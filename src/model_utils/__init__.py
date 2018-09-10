@@ -14,6 +14,8 @@ class MyBaseClass:
     creado = Column(DateTime, server_default=func.now())
     actualizado = Column(DateTime, onupdate=func.now())
 
+    def __init__(self):
+        self.id = generateId()
 
     @classmethod
     def findAll(cls, s):
