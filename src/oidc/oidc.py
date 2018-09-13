@@ -28,9 +28,7 @@ class ClientCredentialsGrant:
         https://tools.ietf.org/html/rfc6749
         sección 4.4
     '''
-
-    token_url = os.environ['OIDC_HOST'] + '/oauth2/token'
-
+    
     def __init__(self, oidc_url, client_id, client_secret, verify=False):
         self.oidc_url = oidc_url
         self.verify = verify
