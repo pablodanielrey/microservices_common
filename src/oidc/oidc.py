@@ -31,10 +31,13 @@ class ClientCredentialsGrant:
 
     token_url = os.environ['OIDC_HOST'] + '/oauth2/token'
 
-    def __init__(self, client_id, client_secret, verify=False):
+    def __init__(self, oidc_url, client_id, client_secret, verify=False):
+        self.oidc_url = oidc_url
         self.verify = verify
         self.client_id = client_id
         self.client_secret = client_secret
+        self.token_url = '{}/oauth2/token'.format(self.oidc_url)
+        self.introspect_url = '{}/oauth2/introspect'.format(self.oidc_url)
 
     def access_token(self, scopes=[]):
         auth = HTTPBasicAuth(self.client_id, self.client_secret)
@@ -57,13 +60,15 @@ class ClientCredentialsGrant:
 
 class TokenIntrospection:
 
-    introspect_url = os.environ['OIDC_HOST'] + '/oauth2/introspect'
-
-    def __init__(self, client_id, client_secret, realm='', verify=False):
+    def __init__(self, oidc_url, client_id, client_secret, realm='', verify=False):
+        self.oidc_url = oidc_url
         self.realm = realm
         self.verify = verify
         self.client_id = client_id
         self.client_secret = client_secret
+        self.token_url = '{}/oauth2/token'.format(self.oidc_url)
+        self.introspect_url = '{}/oauth2/introspect'.format(self.oidc_url)
+
 
     """
     def require_valid_token_for(self, resource, action):
