@@ -12,7 +12,7 @@
 from setuptools import setup, find_packages
 
 setup(name='microservices_common',
-          version='1.3.3',
+          version='1.3.4',
           description='Proyecto que implementa las librerías comunes para los microservicios',
           url='https://github.com/pablodanielrey/microservices_common',
           author='Desarrollo DiTeSi, FCE',
@@ -20,7 +20,7 @@ setup(name='microservices_common',
           classifiers=[
             #   3 - Alpha
             #   4 - Beta
-            #   5 - Production/Stable
+            #   5 - Production/Stable 
             'Development Status :: 3 - Alpha',
             'Programming Language :: Python :: 3',
             'Programming Language :: Python :: 3.5'
