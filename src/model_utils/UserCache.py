@@ -34,7 +34,7 @@ class UserCache:
         faltantes = []
         for uid in uids:
             if uid:
-                usr = cls.redis_assistance.hgetall('usuario_uid_{}'.format(uid))
+                usr = self.redis_.hgetall('usuario_uid_{}'.format(uid))
                 if len(usr.keys()) > 0:
                     usuarios.append(usr)
                 else:
@@ -43,8 +43,8 @@ class UserCache:
             ulen = len(faltantes[0])
             cantidad_maxima_por_query = int((2048 / ulen) - 2)
             while len(faltantes) > 0:
-                uids_a_pedir = faltantes[:cantidad_por_query]
-                faltantes = faltantes[cantidad_por_query:]
+                uids_a_pedir = faltantes[:cantidad_maxima_por_query]
+                faltantes = faltantes[cantidad_maxima_por_query:]
                 obtenidos = self.getter_usuarios(uids_a_pedir, token=token)
                 for usuario in obtenidos:
                     self._setear_usuario_cache(usuario)
