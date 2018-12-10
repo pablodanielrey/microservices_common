@@ -12,7 +12,7 @@
 from setuptools import setup, find_packages
 
 setup(name='microservices_common',
-          version='2.0.1a1',
+          version='2.0.2a1',
           description='Proyecto que implementa las librerías comunes para los microservicios',
           url='https://github.com/pablodanielrey/microservices_common',
           author='Desarrollo DiTeSi, FCE',
@@ -26,8 +26,7 @@ setup(name='microservices_common',
             'Programming Language :: Python :: 3.5'
           ],
           packages=find_packages(exclude=['contrib', 'docs', 'test*']),
-          install_requires=['redis',
-                            'python-etcd',
+          install_requires=['redis==2.10.6',
                             'Flask',
                             'flask_jsontools',
                             'Flask-OIDC',
