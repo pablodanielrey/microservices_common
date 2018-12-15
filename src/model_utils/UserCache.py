@@ -1,5 +1,89 @@
 
 import redis
+import pymongo
+
+
+class MongoUserCache:
+
+    def __init__(self, mongo_url, getters, prefijo='_users_', timeout=60*15):
+        db = '{}_{}'.format(prefijo, self.__class__.__name__)
+        self.mongo = pymongo.MongoClient(mongo_url)[db]
+        self.prefijo = prefijo
+        self.timeout = timeout
+        self.getters = getters
+
+        # indices para la expiración
+        for c in ['usuarios','uids']:
+            self.mongo.drop_collection(c)
+            self.mongo[c].create_index('insertadoEn',expireAfterSeconds=self.timeout)
+
+    def _setear_usuario_cache(self, usr):
+        r = {
+            'usuario':usr,
+            'insertadoEn': datetime.datetime.utcnow()
+        }
+        self.mongo.usuarios.insert_one(r)
+
+    def obtener_usuario_por_uid(self, uid, token=None):
+        usr = self.mongo.usuarios.find_one({'usuario.id':uid})
+        if not usr:
+            usr = self.getters._get_user_uuid(uid, token)
+            if not usr:
+                return None
+            self._setear_usuario_cache(usr)
+        else:
+            usr = usr['usuario']
+        return usr
+
+    def obtener_usuario_por_dni(self, dni, token=None):
+        usr = self.mongo.usuarios.find_one({'usuario.dni':dni})
+        if not usr:
+            usr = self.getters._get_user_dni(dni, token)
+            if not usr:
+                return None
+            self._setear_usuario_cache(usr)
+        else:
+            usr = usr['usuario']
+        return usr
+
+    def obtener_usuarios_por_uids(self, uids=[], token=None):
+        usuarios = []
+        faltantes = []
+        for uid in uids:
+            if uid:
+                usr = self.obtener_usuario_por_uid(uid, token)
+                if usr:
+                    usuarios.append(usr)
+                else:
+                    faltantes.append(uid)
+        if len(faltantes) > 0:
+            ulen = len(faltantes[0])
+            cantidad_maxima_por_query = int((2048 / ulen) - 2)
+            while len(faltantes) > 0:
+                uids_a_pedir = faltantes[:cantidad_maxima_por_query]
+                faltantes = faltantes[cantidad_maxima_por_query:]
+                obtenidos = self.getters._get_users_uid(uids_a_pedir, token=token)
+                for usuario in obtenidos:
+                    self._setear_usuario_cache(usuario)
+                usuarios.extend(obtenidos)
+        return usuarios   
+
+    def obtener_uids(self, token=None):
+        uids = self.mongo.uids.find_one({'id':'uids'})
+        if uids:
+            return uids['uids']
+        
+        uids = self.getters._get_all_uids(token)
+        if not uids or len(uids) <= 0:
+            return []
+        r = {
+            'id':'uids',
+            'uids':uids,
+            'insertadoEn': datetime.datetime.utcnow()
+        }
+        self.mongo.uids.insert_one(r)
+        return uids
+
 
 class UserCache:
     
@@ -62,3 +146,5 @@ class UserCache:
         self._setear_usuario_cache(usr)
         return usr
 
+    def obtener_uids(self, token=None):
+        return []

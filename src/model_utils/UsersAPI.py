@@ -5,6 +5,14 @@ class UsersAPI:
         self.url = api_url
         self.api = api
 
+    def _get_all_uids(self, token=None):
+        query = '{}/usuarios/uids'.format(self.url)
+        r = self.api.get(query, token=token)
+        if not r.ok:
+            return None
+        usr = r.json()
+        return usr
+
     def _get_user_uuid(self, uuid, token=None):
         query = '{}/usuarios/{}'.format(self.url, uuid)
         r = self.api.get(query, token=token)
