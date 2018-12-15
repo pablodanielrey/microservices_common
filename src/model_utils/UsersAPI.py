@@ -40,3 +40,26 @@ class UsersAPI:
         for usr in r.json():
             return usr        
         return None
+
+    def _search_user(self, search, token=None):
+        params = {
+            'q':search
+        }
+        query = '{}/usuario'.format(self.url)
+        r = self.api.get(query, params=params, token=token)
+        if not r.ok:
+            return None
+        for usr in r.json():
+            return usr        
+        return None
+
+    def _search_user(self, search, token=None):
+        params = {
+            'q':search
+        }
+        query = '{}/usuarios'.format(self.url)
+        r = self.api.get(query, params=params, token=token)
+        if not r.ok:
+            return []
+        users = r.json()
+        return users
