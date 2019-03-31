@@ -53,7 +53,7 @@ class UsersAPI:
             return usr        
         return None
 
-    def _search_user(self, search, token=None):
+    def _search_users(self, search, token=None):
         params = {
             'q':search
         }
