@@ -18,10 +18,12 @@ class UsersAPI:
         r = self.api.get(query, token=token)
         if not r.ok:
             return None
-        usr = r.json()
-        if len(usr) > 0:
-            return usr[0]
-        return None
+        data = r.json()
+        if type(data) == list:
+            if len(data) > 0:
+                return data[0]
+            return None
+        return data
 
     def _get_users_uuid(self, uuids=[], token=None):
         uids = '+'.join(uuids)
@@ -29,17 +31,22 @@ class UsersAPI:
         r = self.api.get(query, token=token)
         if not r.ok:
             return None
-        usrs = r.json()        
-        return usrs
+        data = r.json()
+        if type(data) == list:
+            return data
+        return [data]
 
     def _get_user_dni(self, dni, token=None):
         query = '{}/usuario_por_dni/{}'.format(self.url, dni)
         r = self.api.get(query, token=token)
         if not r.ok:
             return None
-        for usr in r.json():
-            return usr        
-        return None
+        data = r.json()
+        if type(data) == list:
+            if len(data) <= 0:
+                return None
+            return data[0]
+        return data
 
     def _search_user(self, search, token=None):
         params = {
@@ -49,9 +56,12 @@ class UsersAPI:
         r = self.api.get(query, params=params, token=token)
         if not r.ok:
             return None
-        for usr in r.json():
-            return usr        
-        return None
+        data = r.json()
+        if type(data) == list:
+            if len(data) > 0:
+                return data[0]
+            return None
+        return data
 
     def _search_users(self, search, token=None):
         params = {
@@ -62,4 +72,6 @@ class UsersAPI:
         if not r.ok:
             return []
         users = r.json()
-        return users
+        if type(users) == list:
+            return users
+        return [users]
