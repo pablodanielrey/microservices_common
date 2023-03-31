@@ -26,7 +26,7 @@ setup(name='microservices_common',
             'Programming Language :: Python :: 3.5'
           ],
           packages=find_packages(exclude=['contrib', 'docs', 'test*']),
-          install_requires=['redis==2.10.6',
+          install_requires=['redis==4.4.4',
                             'Flask',
                             'flask_jsontools',
                             'Flask-OIDC',
